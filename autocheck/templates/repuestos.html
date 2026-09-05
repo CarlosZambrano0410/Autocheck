@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoCheck | Inventario de repuestos (Dueño)</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='repuestos.css') }}">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img class="brand-mark" src="{{ url_for('static', filename='logo.png') }}" alt="Logo AutoCheck">
+    <div>
+      <h1>Auto<span>Check</span> · Inventario</h1>
+      <p>Panel exclusivo del dueño del taller</p>
+    </div>
+  </div>
+  <div class="owner-pill">Acceso dueño</div>
+</header>
+
+<nav class="back-link">
+  <a href="{{ url_for('home') }}">← Volver al inicio</a> ·
+  <a href="{{ url_for('citas_page') }}">Ir a agendar cita</a>
+</nav>
+
+<main>
+  <section class="panel">
+    <div class="toprow">
+      <h2>Inventario de repuestos</h2>
+      <div class="badges">
+        <div class="badge">{{ total_repuestos }} repuesto{{ '' if total_repuestos == 1 else 's' }}</div>
+        <div class="badge">${{ "%.2f"|format(valor_total_inv) }} en stock</div>
+        {% if bajo_stock > 0 %}
+        <div class="badge alerta">{{ bajo_stock }} con stock bajo</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <form class="inv-form" method="post" action="{{ url_for('agregar_repuesto') }}" onsubmit="return validarRepuesto()">
+      <div>
+        <label for="rnombre">Repuesto</label>
+        <input type="text" id="rnombre" name="nombre_repuesto" placeholder="Ej: Filtro de aceite" autocomplete="off">
+      </div>
+      <div>
+        <label for="rmarca">Marca del vehículo</label>
+        <select id="rmarca" name="marca" autocomplete="off">
+          <option value="">Selecciona...</option>
+          {% for m in marcas %}
+          <option value="{{ m }}">{{ m }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="rcantidad">Cantidad</label>
+        <input type="text" id="rcantidad" name="cantidad" placeholder="0" autocomplete="off" oninput="actualizarValorEstimado()">
+      </div>
+      <div>
+        <label for="rminimo">Stock mín.</label>
+        <input type="text" id="rminimo" name="stock_minimo" placeholder="0" autocomplete="off">
+      </div>
+      <div>
+        <label for="rprecio">Precio unitario</label>
+        <input type="text" id="rprecio" name="precio" placeholder="0.00" autocomplete="off" oninput="actualizarValorEstimado()">
+      </div>
+      <button type="submit" class="add-btn">Agregar</button>
+    </form>
+
+    <div class="resumen-calc" id="resumenInv">
+      <div><div class="n" id="calcValorRepuesto">$0.00</div><div class="l">Valor estimado de este repuesto</div></div>
+    </div>
+
+
+    {% if error_repuesto %}
+    <div class="error-box">⚠ {{ error_repuesto }}</div>
+    {% endif %}
+    {% if request.args.get('exito_repuesto') %}
+    <div class="exito-box">✓ Repuesto agregado exitosamente al inventario.</div>
+    {% endif %}
+
+    {% if repuestos %}
+    <table>
+      <thead>
+        <tr>
+          <th>Repuesto</th><th>Cantidad</th><th>Stock mín.</th><th>Precio unit.</th><th>Valor total</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in repuestos %}
+        <tr class="{{ 'bajo' if esta_bajo_stock(r) else '' }}">
+          <td>{{ r.nombre }}<span class="marca-tag">{{ r.marca }}</span></td>
+          <td>
+            <div class="cant-wrap">
+              <form class="qty-form" method="post" action="{{ url_for('ajustar_repuesto', repuesto_id=r.id, direccion='restar') }}">
+                <button type="submit" class="qty-btn">−</button>
+              </form>
+              {{ r.cantidad | int if r.cantidad == r.cantidad|int else r.cantidad }}
+              <form class="qty-form" method="post" action="{{ url_for('ajustar_repuesto', repuesto_id=r.id, direccion='sumar') }}">
+                <button type="submit" class="qty-btn">+</button>
+              </form>
+              <span class="stock-tag {{ 'bajo' if esta_bajo_stock(r) else 'ok' }}">
+                {{ 'Bajo' if esta_bajo_stock(r) else 'OK' }}
+              </span>
+            </div>
+          </td>
+          <td>{{ r.stock_minimo | int if r.stock_minimo == r.stock_minimo|int else r.stock_minimo }}</td>
+          <td>${{ "%.2f"|format(r.precio) }}</td>
+          <td>${{ "%.2f"|format(calcular_valor_repuesto(r)) }}</td>
+          <td>
+            <form method="post" action="{{ url_for('eliminar_repuesto', repuesto_id=r.id) }}">
+              <button type="submit" class="del-btn">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">Aún no hay repuestos registrados. Agrega el primero desde el formulario.</div>
+    {% endif %}
+  </section>
+</main>
+
+<script>
+  function actualizarValorEstimado() {
+    let cantidad = document.getElementById("rcantidad").value;
+    let precio = document.getElementById("rprecio").value;
+
+    if (cantidad == "") { cantidad = 0; }
+    if (precio == "") { precio = 0; }
+
+    let valor = parseFloat(cantidad) * parseFloat(precio);
+    document.getElementById("calcValorRepuesto").innerHTML = "$" + valor.toFixed(2);
+  }
+
+  function validarRepuesto() {
+    let nombre = document.getElementById("rnombre").value;
+    let marca = document.getElementById("rmarca").value;
+    let cantidad = document.getElementById("rcantidad").value;
+    let minimo = document.getElementById("rminimo").value;
+    let precio = document.getElementById("rprecio").value;
+
+    if (nombre == "" || marca == "" || cantidad == "" || minimo == "" || precio == "") {
+      alert("Completa todos los campos del repuesto");
+      return false;
+    }
+
+    if (cantidad < 0 || minimo < 0 || precio < 0) {
+      alert("Cantidad, stock mínimo y precio no pueden ser negativos");
+      return false;
+    }
+
+    return true;
+  }
+</script>
+</body>
+</html>

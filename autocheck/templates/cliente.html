@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoCheck | Agendar cita</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='cliente.css') }}">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img class="brand-mark" src="{{ url_for('static', filename='logo.png') }}" alt="Logo AutoCheck">
+    <div>
+      <h1>Auto<span>Check</span></h1>
+      <p>Agendamiento &amp; Diagnóstico Vehicular</p>
+    </div>
+  </div>
+  <div class="status-strip">
+    <div class="status-item"><div class="n">{{ total_citas }}</div><div class="l">Citas</div></div>
+    <div class="status-item"><div class="n">{{ total_urgentes }}</div><div class="l">Urgentes</div></div>
+  </div>
+</header>
+
+<main>
+  <div class="grid2">
+    <section class="panel">
+      <h2>Nueva cita</h2>
+      <form method="post" action="{{ url_for('agendar') }}" onsubmit="return validarCita()">
+        <label for="nombre">Cliente</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Nombre del cliente" autocomplete="off">
+
+        <label for="placa">Placa del vehículo</label>
+        <input type="text" id="placa" name="placa" placeholder="Ej: PBX-1234" autocomplete="off">
+
+        <label for="modelo">Modelo del vehículo</label>
+        <input type="text" id="modelo" name="modelo" placeholder="Ej: Chevrolet Sail 2019" autocomplete="off">
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha" name="fecha">
+          </div>
+          <div>
+            <label for="hora">Hora</label>
+            <input type="time" id="hora" name="hora">
+          </div>
+        </div>
+
+        <label>Servicios solicitados</label>
+        <div class="servicios-grid">
+          {% for s in servicios %}
+          <label class="servicio-check">
+            <input type="checkbox" name="servicios" value="{{ s.id }}" data-precio="{{ s.precio }}" data-duracion="{{ s.duracion }}" onchange="actualizarResumen()">
+            {{ s.nombre }}
+            <span class="servicio-precio">${{ s.precio }}</span>
+          </label>
+          {% endfor %}
+        </div>
+
+        <label for="problema">Descripción del problema</label>
+        <textarea id="problema" name="problema" placeholder="Ej: ruido en frenos al frenar..."></textarea>
+
+        <div class="resumen-calc" id="resumenCalc">
+          <div><div class="n" id="calcCosto">$0</div><div class="l">Costo est.</div></div>
+          <div><div class="n" id="calcDuracion">0 min</div><div class="l">Duración</div></div>
+        </div>
+        {% if error_cita %}
+        <div class="error-box">⚠ {{ error_cita }}</div>
+        {% endif %}
+        {% if request.args.get('exito_cita') %}
+        <div class="exito-box">✓ Tu cita ha sido agendada exitosamente.</div>
+        {% endif %}
+
+        <button type="submit" class="submit">Agendar cita</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Citas registradas</h2>
+      <div id="listaCitas">
+        {% if citas %}
+          {% for c in citas %}
+          <div class="ticket {{ c.prioridad }}">
+            <div class="semaforo"></div>
+            <div class="ticket-body">
+              <div class="top-row">
+                <h3>{{ c.nombre }}</h3>
+                <span class="placa">{{ c.placa }}</span>
+                <span class="modelo-tag">{{ c.modelo }}</span>
+              </div>
+              <div class="meta">{{ c.fecha }} · {{ c.hora }}</div>
+              {% if c.problema %}<div class="problema">"{{ c.problema }}"</div>{% endif %}
+              <div class="servicios-list">
+                {% for s in c.servicios %}<span class="tag">{{ s }}</span>{% endfor %}
+              </div>
+            </div>
+            <div class="ticket-side">
+              <div class="costo">${{ c.costo }}</div>
+              <div class="dur">{{ c.duracion }} min</div>
+              <form method="post" action="{{ url_for('eliminar_cita', cita_id=c.id) }}">
+                <button type="submit" class="del-btn">Eliminar</button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="empty-state">Aún no hay citas registradas. Agenda la primera desde el formulario.</div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+  <div class="owner-link">
+    <a href="{{ url_for('home') }}">← Volver al inicio</a> ·
+    ¿Eres el dueño del taller? <a href="{{ url_for('pagina_repuestos') }}">Ir al inventario de repuestos</a>
+  </div>
+</main>
+
+<script>
+  function actualizarResumen() {
+    let checkboxes = document.getElementsByName("servicios");
+    let costo = 0;
+    let duracion = 0;
+
+    for (let i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) {
+        costo = costo + parseFloat(checkboxes[i].dataset.precio);
+        duracion = duracion + parseInt(checkboxes[i].dataset.duracion);
+      }
+    }
+
+    document.getElementById("calcCosto").innerHTML = "$" + costo;
+    document.getElementById("calcDuracion").innerHTML = duracion + " min";
+  }
+
+  function validarCita() {
+    let nombre = document.getElementById("nombre").value;
+    let placa = document.getElementById("placa").value;
+    let modelo = document.getElementById("modelo").value;
+    let fecha = document.getElementById("fecha").value;
+    let hora = document.getElementById("hora").value;
+    let checkboxes = document.getElementsByName("servicios");
+    let hayServicio = false;
+
+    for (let i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) {
+        hayServicio = true;
+      }
+    }
+
+    if (nombre == "" || placa == "" || modelo == "" || fecha == "" || hora == "") {
+      alert("Completa todos los campos antes de agendar");
+      return false;
+    }
+
+    if (hayServicio == false) {
+      alert("Selecciona al menos un servicio");
+      return false;
+    }
+
+    return true;
+  }
+</script>
+</body>
+</html>

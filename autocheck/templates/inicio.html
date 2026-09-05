@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoCheck | Taller Automotriz</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='inicio.css') }}">
+</head>
+<body>
+
+<header>
+  <img class="brand-mark" src="{{ url_for('static', filename='logo.png') }}" alt="Logo AutoCheck">
+  <div>
+    <h1>Auto<span>Check</span></h1>
+    <p>Taller Automotriz</p>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h2>Cuidamos tu <span>vehículo</span></h2>
+    <p>
+      En AutoCheck ofrecemos revisión, mantenimiento y diagnóstico automotriz con atención rápida
+      y transparente. Agenda tu cita en línea y evita esperas innecesarias en el taller.
+    </p>
+    <button id="btnAgendar" type="button">Agendar cita</button>
+  </div>
+
+  <div class="grid-info">
+    <div class="card">
+      <h3>Horario</h3>
+      <p>Atendemos de lunes a viernes, de 8:00 a. m. a 5:00 p. m.</p>
+    </div>
+    <div class="card">
+      <h3>Atención</h3>
+      <p>Revisa la disponibilidad y agenda tu cita en menos de un minuto, sin llamadas ni WhatsApp.</p>
+    </div>
+    <div class="card">
+      <h3>Confianza</h3>
+      <p>Diagnóstico claro del problema y prioridad según la urgencia real del vehículo.</p>
+    </div>
+  </div>
+
+  <div class="servicios-lista">
+    <span class="servicio-tag">Cambio de aceite</span>
+    <span class="servicio-tag">Revisión de frenos</span>
+    <span class="servicio-tag">Rotación de llantas</span>
+    <span class="servicio-tag">Diagnóstico de motor</span>
+    <span class="servicio-tag">Revisión de luces</span>
+    <span class="servicio-tag">Chequeo de batería</span>
+  </div>
+</main>
+
+<footer>
+  <div class="owner-link">
+    ¿Eres el dueño del taller? <a href="/repuestos">Ir al inventario de repuestos</a>
+  </div>
+  <div class="creditos">
+    Creado por: Carranza Bryan, Toscano Jhonatan y Zambrano Carlos
+  </div>
+</footer>
+
+<script>
+  // JavaScript real: el boton no es un enlace <a> plano, controla su propio
+  // comportamiento antes de llevar al usuario a la pantalla de agendar cita.
+  const btn = document.getElementById('btnAgendar');
+
+  btn.addEventListener('click', function () {
+    btn.classList.add('cargando');
+    btn.textContent = 'Cargando...';
+    setTimeout(function () {
+      window.location.href = '/citas';
+    }, 400);
+  });
+</script>
+</body>
+</html>

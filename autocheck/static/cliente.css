@@ -1,0 +1,325 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+  background-image: linear-gradient(rgba(240, 240, 240, 0.88), rgba(240, 240, 240, 0.88)), url('fondo-autos.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+header {
+  background-color: white;
+  padding: 20px;
+  border-bottom: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #000;
+  border-radius: 5px;
+  margin-right: 15px;
+  object-fit: cover;
+  display: block;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.brand p {
+  margin: 0;
+  color: #777;
+  font-size: 12px;
+}
+
+.status-strip {
+  display: flex;
+  gap: 20px;
+}
+
+.status-item {
+  text-align: right;
+}
+
+.status-item .n {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.status-item .l {
+  font-size: 11px;
+  color: #777;
+}
+
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.grid2 {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.panel {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.panel h2 {
+  margin-top: 0;
+  font-size: 16px;
+  color: #2563eb;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 5px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+input[type="text"], input[type="date"], input[type="time"], textarea {
+  width: 90%;
+  padding: 10px;
+  margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.servicios-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.servicio-check {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.servicio-precio {
+  color: #777;
+  margin-left: 5px;
+}
+
+.resumen-calc {
+  margin-top: 15px;
+  padding: 12px;
+  background-color: #f5f5f5;
+  border: 1px dashed #ccc;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.resumen-calc .n {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.resumen-calc .l {
+  font-size: 11px;
+  color: #777;
+}
+
+.error-box {
+  margin-top: 12px;
+  padding: 10px;
+  background-color: #fdecea;
+  border: 1px solid #e24b4a;
+  border-radius: 5px;
+  color: #a32d2d;
+  font-size: 13px;
+}
+
+.exito-box {
+  margin-top: 12px;
+  padding: 10px;
+  background-color: #e8f8f0;
+  border: 1px solid #1d9e75;
+  border-radius: 5px;
+  color: #0f6e56;
+  font-size: 13px;
+}
+
+.submit {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.submit:hover {
+  background-color: #1d4ed8;
+}
+
+.empty-state {
+  text-align: center;
+  color: #777;
+  padding: 30px;
+  border: 1px dashed #ccc;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+#listaCitas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ticket {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ticket.urgente { border-left: 5px solid #e24b4a; }
+.ticket.media { border-left: 5px solid #f5c518; }
+.ticket.baja { border-left: 5px solid #1d9e75; }
+
+.semaforo {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 4px;
+}
+
+.ticket.urgente .semaforo { background-color: #e24b4a; }
+.ticket.media .semaforo { background-color: #f5c518; }
+.ticket.baja .semaforo { background-color: #1d9e75; }
+
+.ticket-body {
+  flex: 1;
+}
+
+.top-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.ticket-body h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.placa {
+  font-size: 12px;
+  color: #777;
+  border: 1px solid #ccc;
+  padding: 1px 7px;
+  border-radius: 4px;
+}
+
+.modelo-tag {
+  font-size: 12px;
+  color: #777;
+}
+
+.meta {
+  font-size: 12px;
+  color: #777;
+  margin-top: 4px;
+}
+
+.problema {
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.servicios-list {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 11px;
+  background-color: #eaf1fd;
+  color: #2563eb;
+  border: 1px solid #b5d4f4;
+  padding: 2px 8px;
+  border-radius: 15px;
+}
+
+.ticket-side {
+  text-align: right;
+}
+
+.ticket-side .costo {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.ticket-side .dur {
+  font-size: 11px;
+  color: #777;
+}
+
+.del-btn {
+  background-color: white;
+  border: 1px solid #ccc;
+  color: #555;
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.del-btn:hover {
+  border-color: #e24b4a;
+  color: #e24b4a;
+}
+
+.owner-link {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 13px;
+  color: #555;
+}
